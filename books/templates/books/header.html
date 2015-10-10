@@ -1,0 +1,84 @@
+<link rel="stylesheet" href="/static/css/font-awesome.min.css">
+<script type="text/javascript">
+    $(function(){
+        function init(){
+        $("#individual_wrapper").mouseover(function(){
+            var individual_list = $("#individual_list");
+            individual_list.css("visibility","visible");
+            individual_list.css("height","80px");
+            var individual_wrapper = $("#individual_wrapper");
+            
+            individual_wrapper.css("background", "white");
+            individual_wrapper.css("border", "1px solid #ddd");
+            individual_wrapper.css("border-top", "none");
+            individual_list.css("color","black");
+
+            var name = individual_wrapper.find(".nav_item_name");
+            name.css("color","black")
+           // alert("mouseover")
+        });
+        $("#individual_wrapper").mouseout(function(){
+            var individual_list = $("#individual_list");
+            individual_list.css("visibility","hidden")
+            individual_list.css("height","0px");
+            var individual_wrapper = $("#individual_wrapper")
+            individual_wrapper.css("background", "none")
+            individual_wrapper.css("border", "1px solid rgba(221, 221, 221, 0)")
+            individual_list.css("color","white")
+
+            var name = individual_wrapper.find(".nav_item_name");
+            name.css("color","white")
+        });
+    }
+        init();
+    });
+    
+</script>
+<div class="head">
+    <div class="head_bg"></div>
+    <div class="inner">
+        <div class="logo">
+            <a href="{% url 'index' %}">
+            	<i class="icon-food">
+                    <b>
+            	       订餐中心
+                    </b>
+                </i>
+            </a>
+            
+        </div>
+        
+        <div class="nav">
+            <ul >
+            <li class="nav_item fl">
+                <a class="nav_item_name" href="{% url 'index' %}">首页</a>     
+            </li>
+            
+            {% if user %}
+			<li id="individual_wrapper" class="nav_item fl" style="border:1px solid rgba(221, 221, 221, 0);">
+                    <a class="nav_item_name" href = "{% url 'individual' %}" >
+                        {{user.last_name}}{{user.first_name}}
+                    <i class="icon-sort-down" style="color:white; "> </i>
+                    </a>
+                    <ul id="individual_list" class="individual_nav" style=" visibility:hidden; background:#ffffff; width:90px; height:0px;
+                    margin-top:50px;
+                    ">
+                    <li style="">
+                        <a href = "{% url 'individual' %}" >个人中心 </a>
+                    </li>
+                    <li style="">
+                        <a href = "{% url 'individual' %}" >修改密码   </a>
+                    </li>
+                    <li style="">
+                        <a href="{% url 'logout' %}">注销    </a>
+                    </li>
+                </ul>
+            </li>
+           
+			{% endif %}   
+            </ul>
+        </div>
+    	
+    </div>
+</div>
+

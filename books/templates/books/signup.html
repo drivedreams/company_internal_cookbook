@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="/static/css/common.css">
+	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+</head>
+<body>
+{% include "books/header.html" %}
+{% if hasSignUp %}
+	已报名
+	<br />
+	{% if latestSignUpForm.order %}
+		张旭旭已经为你选好了餐厅：<a href="../">{{latestSignUpForm.order.restaurant.name}}</a>
+	{% else %}
+		这么快就饿了，张管家还没选好餐厅呢！
+	{% endif%}
+{% else %}
+	尚未报名? <a href="{% url 'custom_signup' %}">赶紧报名</a>
+{% endif %}
+</body>
+</html>

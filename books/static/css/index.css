@@ -1,0 +1,18 @@
+/*-------restaurant.css-------*/
+
+
+
+.restaurant {
+	width: 356px;
+	height: 173px;
+	position: relative;
+	margin-right: 20px;
+	margin-bottom: 15px;
+  	background: #fafafa;
+}
+
+.restaurant_info {
+	padding: 10px;
+}
+
+

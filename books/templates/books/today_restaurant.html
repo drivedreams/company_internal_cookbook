@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>餐馆信息</title>
+	<link rel="stylesheet" type="text/css" href="/static/css/common.css">
+	
+	<link rel="stylesheet" type="text/css" href="/static/css/restaurant.css">
+	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+	<script type="text/javascript" language="javascript">
+	    $(function(){
+	    	function init() {
+			$(".add_btn").each(function(){
+				var obj = $(this);
+				var goodId = obj.attr("data")
+				var orderId = obj.attr("order")
+				obj.on('click', function(){  
+					
+					$.ajax({
+						type:"POST",
+						url:"add_menu",
+						data:{"orderId":orderId, "goodId":goodId},
+						dataType:"json",
+						success:function(res) {
+							load_own_order_detail()
+							load_order_detail();
+						},
+						error:function(e){
+							alert("添加失败")
+						}
+					});
+				});  
+			});  
+			load_own_order_detail()
+			load_order_detail();
+
+			//edit_menus()
+		};
+
+		function load_own_order_detail(){
+			//alert("load_order_detail")
+			$.ajax({
+				type:"POST",
+				url:"load_own_order_detail",
+				data:{"orderId":{{order.id}}},
+				dataType:"json",
+				success:function(res) {
+					var json = eval(res);
+					console.log(res)
+					var html = "<table ><thead class=\"order_head\"><tr ><td class=\"item_name\">菜品</td><td class='edit_count item_count'>份数</td><td class='item_remark'>备注</td></tr></thead>";
+					//var total_price= 0;
+					var total_price= 0;
+					$(json).each(function(index) {
+						
+						var godd_menus = json[index];
+						var key = godd_menus.key;
+						var remark = "";
+						menuIds = "{"
+						for(var menu in godd_menus.menus){
+							var good = godd_menus.menus[menu].menu.good;
+							var order = godd_menus.menus[menu].menu.order;
+							if(remark == "" && godd_menus.menus[menu].menu.remark != ""){
+								remark = godd_menus.menus[menu].menu.remark;
+							}
+							menuIds += "\'" +godd_menus.menus[menu].menu.id + "\':" + "\'" + godd_menus.menus[menu].menu.id + "\',";
+						};
+						menuIds = menuIds.substring(0,menuIds.length-1);
+						menuIds += "}"
+						var menus_dict = eval(godd_menus.menus);
+						html += "<tr class=\"item own_menu_item\" style=\"display: table-row;\" data=\"" + menuIds + "\">"
+						total_price += parseInt(godd_menus.good_total_price)
+						html += "<td class='item_name' data=\"{'good':"+ good + ", 'order':"+ order +"}\"> "+ key + "(￥"+ godd_menus.good_total_price + ")"+ "</td>";
+						html += "<td class='edit_count item_count'>";
+
+						html += "<span class=\"minus link\"><i class=\"icon-minus-sign\"></i></span>";
+						html += "<input class=\"count_input\" type=\"input\" data=\"edit_count\" value=\""+ godd_menus.size + "\" readonly style=\"width:15px; text-align: center;\"/>";
+						//html += "";
+						html += "<span class=\"plus\"> <i class=\"icon-plus-sign  link\"></i> </span>";
+						html += "份 </td>";
+						html += "<td class='item_remark'>";
+						html += "<input class =\"remark_input\" type=\"input\" placeholder=\"此处添加备注\" value=\"" + remark + "\"/>";
+						html += "<i class=\" icon-remove \" style=\"margin-left:5px; visibility:hidden;\"/>";
+						
+						html += "</td>";
+						html += "</tr>"
+						
+					});
+					html += "<tr>"
+					html += "<td colspan='3'>总价：￥" + total_price
+					html += "</td>"
+					html +="</tr>"
+					html += "</table>"
+				//	alert(html)
+					$("#edit_menus_wrapper").empty();
+					$("#edit_menus_wrapper").append(html);
+					//alert(res.msg)
+
+					$(".own_menu_item").each(function(){
+						var removebtn = $(this).find('.icon-remove');
+						var own_menu_item = $(this);
+						var count_input = own_menu_item.find("input.count_input");
+						var remark_input = own_menu_item.find("input.remark_input");
+						var minus = $(this).find(".minus"); 
+						minus.css('color','orange')
+						var plus = $(this).find(".plus"); 
+						plus.css('color','green');
+
+						$(this).mouseover(function(){
+							removebtn.css("visibility","visible")
+						  	
+						});
+
+
+						$(this).mouseout(function(){
+							removebtn.css("visibility","hidden")
+						});
+
+						removebtn.click(function(){
+							var menuIds = own_menu_item.attr('data')
+							
+								$.ajax({
+										type:"POST",
+										url:"del_menu",
+										data:{"menuIds":menuIds},
+										dataType:"json",
+										success:function(res) {
+											load_own_order_detail();
+											load_order_detail();
+										},
+										error:function(e){
+											alert("添加失败")
+										}
+								});
+							}
+						);
+
+						
+						minus.unbind('click').click(function(){
+							var count_value = parseInt(count_input.val());
+							var menuIds = own_menu_item.attr('data')
+							var menuIds = eval("("+ menuIds +")");
+							for( var key in menuIds){
+								var id = menuIds[key];
+								break;
+							}
+							var menuIdTb = "{'" + id + "':" + id + "}";
+							if(count_value >= 1){
+
+								$.ajax({
+										type:"POST",
+										url:"del_menu",
+										data:{"menuIds":menuIdTb},
+										dataType:"json",
+										success:function(res) {
+											load_own_order_detail();
+											load_order_detail();
+											count_value -= 1;
+										},
+										error:function(e){
+											alert("删除失败，请确定此订单是否有效！")
+										}
+								});
+							}
+							
+							count_input.val(count_value);
+						});
+
+						plus.unbind('click').click(function(){
+							var goodItem = own_menu_item.find("td.item_name");
+							var data = goodItem.attr("data");
+							var values = eval("(" + data + ")");
+							var count_value = parseInt(count_input.val());
+							$.ajax({
+								type:"POST",
+								url:"add_menu",
+								data:{"orderId":values.order, "goodId":values.good},
+								dataType:"json",
+								success:function(res) {
+									load_own_order_detail()
+									load_order_detail();
+									count_value += 1;
+								},
+								error:function(e){
+									alert("添加失败")
+								}
+							});
+							
+							count_input.val(count_value);
+						}); 
+
+						remark_input.change(function(){
+							console.log($(this).val());
+							var menuIds = own_menu_item.attr('data')
+							$.ajax({
+									type:"POST",
+									url:"update_menus",
+									data:{"menuIds":menuIds, "remark":$(this).val()},
+									dataType:"json",
+									success:function(res) {
+										load_own_order_detail();
+										load_order_detail();
+									},
+									error:function(e){
+										alert("添加失败")
+									}
+							});
+						});
+
+					});
+				},
+				error:function(e){
+					alert("加载失败！")
+				}
+			});
+		};
+
+		function load_order_detail(){
+			//alert("load_order_detail")
+			$.ajax({
+				type:"POST",
+				url:"load_order_detail",
+				data:{"orderId":{{order.id}}},
+				dataType:"json",
+				success:function(res) {
+					var json = eval(res);
+					var html = "<table style=\"width:100%;\"><thead class=\"order_head\"><tr ><td class=\"item_name\">菜品</td><td class='item_count'>份数</td><td class='item_remark'>备注</td></tr></thead>";
+					var total_price= 0;
+					$(json).each(function(index) {
+
+						html += "<tr class=\"item\" style=\"display: table-row;\">"
+						var godd_menus = json[index];
+						var key = godd_menus.key;
+
+						var menus_dict = eval(godd_menus.menus);
+						total_price += parseInt(godd_menus.good_total_price)
+						html += "<td class='item_name'> "+ key + "(￥"+ godd_menus.good_total_price + ")"+ "</td>"
+						html += "<td class='item_count'>" + godd_menus.size + "份 </td>"
+						html += "<td class='item_remark'>"
+						var tmp_remark = ''
+						var tmp_user = ''
+						$(menus_dict).each(function function_name (index) {
+							var menu = eval(menus_dict[index])
+							
+							if (menu.menu.remark ){
+								tmp_remark = menu.menu.remark;
+								tmp_user = menu.user_name;
+								html += 
+								"<span>" + menu.user_name + ":</span><span>";
+								html += "(" + menu.menu.remark + ")";
+								html += "</span><br />";
+							} 
+							
+						});
+						html += "</td>";
+						html += "</tr>"
+						
+					});
+					html += "<tr>"
+					html += "<td colspan='3'>总价：￥" + total_price
+					html += "</td>"
+					html +="</tr>"
+					html += "</table>"
+				
+					$("#order_detail_wrapper").empty();
+					$("#order_detail_wrapper").append(html);
+					//alert(res.msg)
+				},
+				error:function(e){
+					alert("加载失败！")
+				}
+			});
+		};
+			init();
+		});
+		
+	</script>
+</head>
+<body>
+{% include "books/header.html" %}
+<ul class="fl">
+<li>
+<div class = "restaurant_header">
+	<div class = "fl">
+	<img class ="restaurant_img" src="{{restaurant.pic.url}}" />
+	</div>
+	<div class = "fl icon_content">
+		{{restaurant.name}}  <br />
+		<a href= "{{restaurant.URL}}">查看源链接</a>
+	</div>
+
+</div>
+<p></p>
+</li>
+<div class = "good_list">
+	
+		{% for key,value in categorys_goods.items %}
+			<li>
+			<div class = "restaurant_header">
+			<div>
+			<span class= "good_category">{{key}}</span>
+			</div>
+			<br />
+			{% for good in value %}
+				<div class = "good_item fl">
+					<div class="fl">
+						<a title = "商品" href= "{% url 'good' good.id %}">
+							<img class = "good_img" src="{{good.pic.url}}">	
+						</a>
+					</div>
+					<div class="icon_content fl">
+						{{good.name}}
+						<br />
+						<br />
+						价格：￥{{good.price}}
+						<br />
+						<br />
+						
+					</div>
+					<div class = "add_btn_wrapper link"  >
+						<i class="icon-plus-sign icon-2x add_btn " data="{{good.id}}" order="{{order.id}}"></i>
+						{# <img class = "add_btn" src="/static/img/add.png" /> #}
+					</div>
+					<div class="mod-tip list-item-overlay" style="z-index: 1000; display: none; position: absolute; top: 80px; left: -7px; width:98%;   background: #fefaef;">
+						<span>测试</span>
+					</div>
+				</div>
+			{% endfor %}
+			</div>
+
+			</li>
+		{% endfor %}
+	
+</div>
+
+</ul>
+
+<div class = "fr order ">
+	
+	<div>
+	<a href="{% url 'individual_in_restaurant' restaurant.id %}"><i class="icon-eye-open">查看本人本店本店历史记录</i></a>
+	</div>
+	<br />
+	<div  class = "order_detail fl">
+		<div class = "title" >
+			<span class="fl"><li class="icon-flag">我的订餐</li></span>
+		</div>
+		<div id="edit_menus_wrapper" >
+			
+		</div>
+		<div class = "title" >
+		<span class="fl"><li class="icon-flag">所有订餐</li></span>
+		</div>
+		<div id="order_detail_wrapper">
+			
+		</div>
+	</div>
+
+</div>
+</body>
+</html>

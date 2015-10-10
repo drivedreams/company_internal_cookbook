@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="/static/css/common.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/index.css">
+	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/static/js/ZeroClipboard.js"></script>
+	<script type="text/javascript" language="javascript">
+	    $(function(){
+	    	function init() {
+			$('.restaurant').each(function(){
+				var restaurant = $(this);
+				var r_btn = restaurant.find('.r_btn')
+				var restaurantId = r_btn.attr('data');
+				r_btn.unbind('click').click(function(){
+					$.ajax({
+						type:"POST",
+						url:"new_order",
+						data:{"restaurantId":restaurantId, "name":"晚餐"},
+						dataType:"json",
+						success:function(res) {
+							alert('成功！')
+						},
+						error:function(e){
+							alert("添加失败")
+						}
+					});
+				});
+				
+			});
+			obtain_signup_list();
+			obtain_opened_orders();
+			
+		}
+		function obtain_opened_orders(){
+			$.ajax({
+				type:"POST",
+				url:"obtain_opened_orders",
+				data:{},
+				dataType:"json",
+				success:function(res) {
+					var json = eval("(" + res +")");
+					console.log(json);
+					var opened_order_tb = $("#opened_order_tb");
+					var html = "";
+					$(json).each(function(index){
+						var order = json[index];
+						html += "<tr class=\" opened_order_item \" data = \"" + order.order_id +"\"><td>"+  order.restaurant + "\(" + order.date + "\)" + "</td><td class=\"turn_off\"><i class=\" icon-off \" style=\"color:red; visibility:hidden; \"></i></td></tr>";
+					});
+
+					opened_order_tb.empty();
+					opened_order_tb.append(html);
+
+					$(".opened_order_item ").each(function(){
+						var turn_off_btn = $(this).find(".turn_off");
+						var icon_off = $(this).find(".icon-off");
+						var order_id = $(this).attr("data")
+						turn_off_btn.unbind('click').click(function(){
+							$.ajax({
+								type:"POST",
+								url:"turn_off_order",
+								data:{"order_id":order_id},
+								dataType:"json",
+								success:function(res) {
+									obtain_opened_orders();
+								},
+								error:function(e){
+									alert("关闭失败")
+								}
+							});
+						});
+
+						$(this).mouseover(function(){
+							icon_off.css("visibility","visible");
+						});
+
+						$(this).mouseout(function(){
+							icon_off.css("visibility","hidden");
+						});
+					});
+				},
+				error:function(e){
+					alert("获取开启状态的订单失败");
+				}
+			});
+		}
+		function obtain_signup_list(){
+			$.ajax({
+				type:"POST",
+				url:"obtain_signup_list",
+				data:{},
+				dataType:"json",
+				success:function(res) {
+					var json = eval("(" + res +")");
+					var signup_tb = $("#signup_tb");
+					var html = "";
+					$(json).each(function(index){
+						var form_custom = json[index];
+						html += "<tr class=\" signup_item \"><td>"+  form_custom.form_name + "</td><td class=\"removebtn\" data=\""+ form_custom.form_custom_id +"\" style=\"display:none; \"><i class=\" icon-remove \" style=\"color:red;  \"></i></td></tr>";
+					});
+
+					signup_tb.empty();
+					signup_tb.append(html);
+
+					$(".signup_item").each(function(){
+
+						var signup_item = $(this)
+						var removebtn = $(this).find(".removebtn");
+						var formCustomId = removebtn.attr("data");
+						signup_item.mouseover(function(){
+							removebtn.css("display","block");
+						});
+
+						signup_item.mouseout(function(){
+							removebtn.css("display","none");
+						});
+
+						removebtn.unbind('click').click(function(){
+							$.ajax({
+								type:"POST",
+								url:"cancel_signup",
+								data:{"form_custom_id":formCustomId},
+								dataType:"json",
+								success:function(res) {
+									obtain_signup_list();
+								},
+								error:function(e){
+									alert("取消注册失败")
+								}
+							});
+
+						});
+					});
+				},
+				error:function(e){
+					alert("获取报名表失败");
+				}
+			});
+		}
+		/**
+		 * 模仿android里面的Toast效果，主要是用于在不打断程序正常执行的情况下显示提示数据
+		 * @param config
+		 * @return
+		 */
+		function warn(msg,opt,left,top){
+
+			if(opt){
+				var obj = $("#"+opt);
+			}
+			new Toast({context:$('body'),message:msg},obj,left,top).show();
+			 
+		}
+		var Toast = function(config,obj,left,top){
+			this.context = config.context==null?$('body'):config.context;//上下文
+			this.message = config.message;//显示内容
+			this.time = config.time==null?5000:config.time;//持续时间
+			this.left = config.left;//距容器左边的距离
+			this.top = ($(document).height()/4)*3;//距容器上方的距离
+			if(obj){ 
+				this.left = obj.offset().left + left;
+				this.top = obj.offset().top + top;
+			}
+			this.init();
+		}
+		var msgEntity;
+		Toast.prototype = {
+			//初始化显示的位置内容等
+			init : function(){
+			$("#toastMessage").remove();
+				//设置消息体
+				var msgDIV = new Array();
+				msgDIV.push('<div id="toastMessage">');
+				msgDIV.push('<span>'+this.message+'</span>');
+				msgDIV.push('</div>');
+				msgEntity = $(msgDIV.join('')).appendTo(this.context);
+				//设置消息样式
+				var left = this.left == null ? this.context.width()/2-msgEntity.find('span').width/2 : this.left;
+				var top = this.top == null ? '20px' : this.top;
+				msgEntity.css({position:'absolute',top:top,'z-index':'99',left:left,'background-color':'black',color:'white','font-size':'12px',padding:'5px',margin:'5px','border-radius':'4px','-moz-border-radius':'4px','-webkit-border-radius':'4px',opacity:'0.5','font-family':'微软雅黑'});
+				//msgEntity.addClass(".toast");
+				msgEntity.hide();
+			},
+			//显示动画
+			show :function(){
+				msgEntity.fadeIn(this.time/2);
+				msgEntity.fadeOut(this.time/2);
+			}
+		  
+		}
+			init();
+		});
+		
+	</script>
+</head>
+<body>
+{% include "books/header.html" %}
+<div>
+{% if restaurant_list %}
+    <ul>
+    {% for restaurant in restaurant_list %}
+    <li class="restaurant fl">
+       
+   		<div class="restaurant_icon fl">
+	        <a title = "店铺图标" href="{% url 'restaurant' restaurant.id %}">
+		        <img class = "restaurant_img" src="{{ restaurant.pic.url }}">
+		    </a>
+	    </div>
+	    <div class="restaurant_info fl" >
+		    <a title = "店名" href= "{% url 'restaurant' restaurant.id %}">
+		        {{ restaurant.name }}
+		   	</a>
+		   	<p >
+		   	<a title = "店铺信息来源链接"  href="{{restaurant.URL}}">源链接</a>
+		   	<p />
+		   	<input type= "button" id="r_btn{{restaurant.id}}" class="r_btn" data="{{restaurant.id}}" value= "获取今日店铺地址" />
+	   	</div>
+	</li>
+    {% endfor %}
+    {{STATIC_PATH}}
+    </ul>
+
+{% else %}
+    No restaurant are available. 
+{% endif %}
+</p>
+</p>
+</div>
+
+<div >
+	报名表：<i class="icon-plus" style="color:green;"></i>
+		<table id="signup_tb">
+			
+		</table>	
+</div>
+
+<div>
+	开起的订单:
+		<table id="opened_order_tb">
+			
+		</table>
+</div>
+</body>
+
+
+
+
+</html>

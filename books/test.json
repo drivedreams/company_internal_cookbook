@@ -1,0 +1,31 @@
+<section class="cart-section cart-fix" id="cart-section">
+<div class="menu-cart menu-cart-box-shadow">
+<div class="cc-warp hide" style="display: block;">
+<div class="title">
+<span class="txt">购物车</span>
+<span class="clear-cart">清空</span>
+</div>
+<div class="cart-panel" style="max-height: 156.6px;">
+<table>
+<thead class="cart-head">
+<tr>
+<td class="item-name">菜品</td>
+<td class="item-count">份数</td>
+<td class="item-price">单价</td>
+<td class="item-delete"></td>
+</tr>
+</thead>
+<tbody class="item-list" data-node="item-list">
+<tr class="item normal-item hide" data-stockid="undefined" id="cartItem_1448733964" style="display: table-row;"><td class="item-name">烤羊肉</td><td class="item-count"><input type="hidden" value="1448733964"><span class="item-minus" value="" type="button"></span><input class="item-count" type="input" value="1"><span class="item-plus" value="" type="button"></span></td><td class="item-price">¥29.0</td><td class="item-delete"><span class="item-delete-icon">×</span></td></tr><tr class="item send-price"><td class="item-name" colspan="2">配送费(不计入起送价)</td><td class="item-price">¥0.0</td><td class="item-delete"></td></tr></tbody>
+</table>
+</div>
+</div>
+<div class="cart-bar pointer">
+<span class="cart-logo fl"></span>
+<span class="cart-desc " id="cartIsEmpty" style="display: none;">购物车是空的</span>
+<span class="cart-desc fl" id="cartAmout" style="display: block;">共&nbsp;¥29.0 元</span>
+<span class="cart-desc cart-cha fr" id="cartCha" style="display: block;">差&nbsp;¥51.0起送</span>
+<span class="cart-desc submit fr" id="cartSubmit" style="display: none;">选好了</span>
+</div>
+</div>
+</section>

@@ -1,0 +1,83 @@
+<html>
+	
+<head>
+	<title>个人信息</title>
+	<link rel="stylesheet" type="text/css" href="/static/css/common.css">
+	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+	<script type="text/javascript">
+		$(function(){
+			function init(){
+				$('.good_individual_item').each(function(){
+					var good_individual_item = $(this);
+					var comment_input = good_individual_item.find('input.comment_input');
+					var menuId = good_individual_item.attr('data'); 
+					comment_input.change(function(){
+						var comment_input = $(this);
+						var comment = $(this).val();
+						$.ajax({
+							type:"POST",
+							url:"update_menu",
+							data:{"menuId":menuId, "comment":comment},
+							dataType:"json",
+							success:function(res){	
+								comment_input.attr("disabled","disabled")
+							},
+							error:function(e){
+								console.log(e)
+							}
+						});
+					});
+				});
+			}
+
+			init();
+		});
+
+		
+
+	</script>
+</head>
+
+<body>
+
+{% include "books/header.html" %}
+	<div style="margin-left:20px;margin-top:20px;">
+
+		{% for menu in menus %}
+
+			<div class = "good_individual_item fl" data="{{menu.id}}">
+					<div class="fl">
+						<a title = "商品" href= "{% url 'good' menu.good.id %}">
+							<img class = "good_img" src="{{menu.good.pic.url}}">	
+						</a>
+					</div>
+					<div class="good_individual_content fl">
+						{{menu.good.restaurant}}
+						{{menu.good.name}}
+						<br />
+						日期：
+						<span>{{menu.order.date_24}}</span>
+						<br />
+						价格：￥{{menu.good.price}}
+						<br />
+						备注：{{menu.remark}}
+						<br />
+						顾客：{{menu.custom.user.last_name}}{{menu.custom.user.first_name}}
+						<br/>
+						评论：{% if menu.comment %}{{menu.comment}}
+						{% else %}<input class="comment_input" type="input">
+						{% endif%}
+						
+						
+					</div>
+				
+					<div class="mod-tip list-item-overlay" style="z-index: 1000; display: none; position: absolute; top: 80px; left: -7px; width:98%;   background: #fefaef;">
+						<span>测试</span>
+					</div>
+				</div>
+			
+		{% endfor %}
+	</div>
+
+</body>
+</html>

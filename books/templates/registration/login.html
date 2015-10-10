@@ -1,0 +1,30 @@
+<!DOCTYPE html>  
+<html>  
+    <head>  
+        <title>login</title> 
+        <link rel="stylesheet" type="text/css" href="/static/css/common.css"> 
+    </head>  
+    <body>  
+    <div class="login">
+        <form method="post" action="{% url 'django.contrib.auth.views.login' %}">  
+        {% csrf_token %}  
+                {% if form.errors %}  
+                <p>账号或密码不正确，请重试！</p> 
+                {% endif %}  
+                <table>  
+                <tr>  
+                    <td>{{ form.username.label_tag }}</td>  
+                    <td>{{ form.username }}</td>  
+                </tr>  
+                <tr>  
+                    <td>{{ form.password.label_tag }}</td>  
+                    <td>{{ form.password }}</td>  
+                </tr>  
+                </table>  
+      
+            <input type="submit" value="登陆" />  
+            <input type="hidden" name="next" value="{{ next }}" />  
+        </form>  
+    </div>
+    </body>  
+</html> 

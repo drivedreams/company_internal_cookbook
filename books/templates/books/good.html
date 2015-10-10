@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>商品信息</title>
+	<link rel="stylesheet" type="text/css" href="/static/css/common.css">
+</head>
+<body>
+{% include "books/header.html" %}
+<ul >
+<li>
+<div class = "good_item">
+	<div class = "fl">
+		<img class ="good_img" src="{{good.pic.url}}" />
+	</div>
+	<div class = "fl icon_content">
+		{{good.name}}
+	</div>
+	
+</div>
+<div class = "single_line">
+	<hr class = "fl" style="width:30px;" />
+	<span class = "fl" > 评论</span>
+	<hr class = "fl"  style="width:300px;" />
+</div>
+<div>
+	
+</div>
+<div class="comment_content"> 
+		{% for menu in menus %}
+		
+		<div class ="good_comment_item fl">
+			<div class=" fl">
+				<img class="user_icon" src="{{menu.custom.pic.url}}"/>
+				<br />
+				<span class="name">{{menu.custom.user.last_name}}{{menu.custom.user.first_name}}</span>
+			</div>
+			<div class="fl">
+				日期：{{menu.order.date_24}}
+				<br />
+				<br />
+				备注：{{menu.remark}}
+				<br />
+				<br />
+				评论：{{menu.comment}}
+				
+			</div>
+		</div>
+		{% endfor %}
+</div>
+<li>
+</ul>
+</body>
+</html>

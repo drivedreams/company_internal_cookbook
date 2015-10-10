@@ -1,0 +1,88 @@
+.good_list {
+	display: block;
+	position: relative;
+}
+
+.good_category{
+	font-size: 18px;
+	color: #333;
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.add_btn {
+	color: #CA3A2F;
+}
+
+
+.restaurant_header{
+	display: inline-block;
+}
+
+.order {
+	position: absolute;
+	right: 25px;
+}
+
+.order .order_detail{
+	background: #fff;
+	box-shadow: 0 -1px 10px 2px #e4e4e4;
+}
+
+.order .order_detail .title{
+	height: 40px;
+	line-height: 38px;
+	padding: 0 12px;
+	background: #fafafa;
+	font-size: 14px;
+	color: #D77414;
+	font-weight: 400;
+	text-decoration: none;
+}
+
+.order .order_detail .title .edit{
+	background: url("/static/img/btn_edit_default.png") no-repeat;
+	padding-left: 26px;
+
+}
+
+.order .order_detail table td {
+  	padding: 8px 8px;
+  	vertical-align: middle;
+  	height: auto;
+
+}
+
+.order .order_detail .order_head {
+  	color: #aaa;
+}
+
+.order_head tr{
+	border-bottom: 1px solid #ddd;
+}
+
+.order .order_detail .head{
+	border-bottom: 1px solid #ddd;
+}
+
+
+.order .order_detail .item{
+	border-bottom: 1px solid #ddd;
+}
+
+.order .order_detail .item_name{
+  	width: 123px;
+	text-align: left;
+	padding-left: 12px;
+}
+
+.order .order_detail .item .item_count{
+  	width: 75px;
+  	text-align: left;
+}
+  
+.order .order_detail .item .item_remark{
+  	width: auto;
+}
+  
+

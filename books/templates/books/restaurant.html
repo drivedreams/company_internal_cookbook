@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>餐馆信息</title>
+	<link rel="stylesheet" type="text/css" href="/static/css/common.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/restaurant.css">
+</head>
+<body>
+{% include "books/header.html" %}
+<ul >
+<li>
+<div class = "restaurant_header">
+	<div class = "fl">
+	<img class ="restaurant_img" src="{{restaurant.pic.url}}" />
+	</div>
+	<div class = "fl icon_content">
+		{{restaurant.name}}
+	</div>
+
+</div>
+<p></p>
+</li>
+<div class = "good_list">
+	
+		{% for key,value in categorys_goods.items %}
+			<li>
+			<div class = "restaurant_header">
+			<div>
+			{{key}}
+			</div>
+			<br />
+			{% for good in value %}
+				<div class = "good_item fl">
+				<div class="fl">
+					<a title = "商品" href= "{% url 'good' good.id %}">
+						<img class = "good_img" src="{{good.pic.url}}">	
+					</a>
+				</div>
+				<div class="icon_content fl">
+					{{good.name}}
+					<br />
+					<br />
+					￥{{good.price}}
+					<br />
+					<br />
+					<img src="/static/img/add.png"/>
+				</div>
+
+				</div>
+			{% endfor %}
+			</div>
+
+			</li>
+		{% endfor %}
+	
+</div>
+
+<div>
+</div>
+</ul>
+</body>
+</html>
